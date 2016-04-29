@@ -1,1 +1,1 @@
-angular.module('appLembrete', ['lembreteCtrl', 'lembreteService']);
+angular.module('lembrete', ['lembreteController', 'lembreteService']);
