@@ -1,9 +1,6 @@
-var Lembrete = require('./models/lembrete');
+var express = require('express');
+var Sequelize = require('sequelize');
+var models = require('./models');
+var restful = require('new-sequelize-restful');
 
-function getLembretes(res){
-	Lembrete.find(function (err, lembretes){
-		if(err)
-			res.send(err);
-		res.json(lembretes);
-	});
-};
+

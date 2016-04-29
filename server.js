@@ -6,7 +6,7 @@ var morgan = require('morgan');
 var bodyParser = require('body-parser');
 var methodOverride = require('method-override');
 var Sequelize = require('sequelize');
-
+var restful = require('sequelize-restful');
 //db
 
 var sequelize = new Sequelize('lembrete', 'admin', 'sam123', {
@@ -32,9 +32,21 @@ app.use(bodyParser.json()); // parse application/json
 app.use(bodyParser.json({type: 'application/vnd.api+json'})); // parse application/vnd.api+json as json
 app.use(methodOverride('X-HTTP-Method-Override')); // override with the X-HTTP-Method-Override header in the request
 
+//
 
-// routes ======================================================================
+var Lembrete = sequelize.define('Lembrete', {
+	msg: Sequelize.TEXT,
+	freezeTableName: true
+});
 
+var User = sequelize.define('User', {
+	name: Sequelize.STRING,
+	passwd: Sequelize.STRING
+})
+
+User.hasMany(Lembrete, {foreignKey: 'user_id'})
+
+app.use(restful(sequelize));
 
 // listen (start app with node server.js) ======================================
 app.listen(3000);
