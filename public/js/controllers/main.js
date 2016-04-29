@@ -7,7 +7,7 @@ angular.module('lembreteController', [])
 	});
 
 	$scope.createLembrete = function(){
-		if($.scope.formData.text != undefined){
+		if($scope.formData.text != undefined){
 			Lembretes.create($scope.formData).success(function(data){
 				$scope.formData = {};
 				$scope.lembretes = data;
