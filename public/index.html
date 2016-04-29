@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html ng-app="lembrete">
+<head>
+    <title>Lembretes</title>
+    <script type="text/javascript" src="angular/angular.js"></script>
+    <link rel="stylesheet" type="text/css" href="bootstrap/bootstrap.min.js">
+    <script>
+        angular.module("lembrete", []);
+        angular.module("lembrete").controller("LembreteCtrl", function($scope){
+            $scope.app = "Lembrete";
+
+            $scope.lembretes = [
+                {id:1, msg:"Lembrete Um"}
+                {id:2, msg:"Lembrete Dois"}
+                {id:3, msg:"Lembrete Tres"}
+                {id:4, msg:"Lembrete Quatro"}
+                {id:5, msg:"Lembrete Cinco"}
+            ];
+        });
+    </script>
+</head>
+<body ng-controller="LembreteCtrl">
+
+</body>
+</html>
