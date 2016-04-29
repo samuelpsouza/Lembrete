@@ -10,6 +10,7 @@ var Sequelize = require('sequelize');
 //db
 
 var sequelize = new Sequelize('lembrete', 'admin', 'sam123', {
+	  host: "localhost",
       dialect: "postgres", // or 'sqlite', 'postgres', 'mariadb'
       port:    5432, // or 5432 (for postgres)
     });
@@ -33,7 +34,7 @@ app.use(methodOverride('X-HTTP-Method-Override')); // override with the X-HTTP-M
 
 
 // routes ======================================================================
-require('./app/routes.js')(app);
+
 
 // listen (start app with node server.js) ======================================
 app.listen(3000);
