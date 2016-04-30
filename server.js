@@ -44,9 +44,37 @@ var User = sequelize.define('User', {
 	passwd: Sequelize.STRING
 })
 
-User.hasMany(Lembrete, {foreignKey: 'user_id'})
+//User.hasMany(Lembrete, {foreignKey: 'user_id'})
 
-app.use(restful(sequelize));
+//app.use(restful(sequelize));
+
+var router = express.Router();
+
+router.use(function(req, res, next){
+	console.log("A request is here.");
+	next();
+});
+
+router.get('/', function(req, res){
+	res.json({ message: 'Everything is working' });
+});
+
+router.post('/createLembrete', function(req, res){
+		res.json({ message: "Created" });
+});
+router.get('/getLembretes', function(req, res){
+		res.json({ message: "All of them sent" });
+});
+
+router.put('/editLembrete/:lembrete_id', function(req, res){
+		res.json({ message: "Edited" });
+});
+router.delete('/deleteLembrete/:lembrete_id', function(req, res){
+		res.json({ message: "Deleted" });
+});
+
+
+app.use('/api', router);
 
 // listen (start app with node server.js) ======================================
 app.listen(3000);
