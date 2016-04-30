@@ -1,18 +1,18 @@
 angular.module('lembreteService', [])
 	
-	.factory('Lembretes', function($http){
+	.factory('Lembrete', function($http){
 		return {
 			get : function() {
 				return $http.get('/api/getLembretes');
 			},
 			create : function(lembreteData){
-				return $http.post('/createLembrete', lembreteData);
+				return $http.post('/api/createLembrete', lembreteData);
 			},
 			edit : function(id){
-				return$http.put('/editLembrete/' + id)
+				return$http.put('/api/editLembrete/' + id)
 			},
 			delete : function(id){
-				return $http.post('/deleteLembrete/' + id);
+				return $http.post('/api/deleteLembrete/' + id);
 		}
 	}
 });

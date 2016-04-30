@@ -8,10 +8,20 @@
     <script type="text/javascript" src="./js/app.js"></script>
 </head>
 <body ng-controller="mainController">
-Lembretes
-    <form>
-        <textarea placeholder="Escreva seu lembrete" ng-model="formData.text"></textarea>
-        <button type="submit" ng-click="createLembrete()">Add note</button>
-    </form>
+<h1>Lembretes</h1>
+   <div ng-repeat="(key, value) in lembretes">
+        {{value.msg}}
+        <form>
+            <button type="submit" ng-click="deleteLembrete(value.id)">Deletar</button>
+            <button type="submit" ng-click="editLembrete(value.id)">Editar</button>
+        </form>
+   </div>
+    <div>
+        <form>
+            <textarea placeholder="Escreva seu lembrete" ng-model="formData.text"></textarea>
+            <button type="submit" ng-click="createLembrete()">Add note</button>
+            <button type="reset">Limpar</button>
+        </form>
+    </div>   
 </body>
 </html>

@@ -1,14 +1,14 @@
 angular.module('lembreteController', [])
-	.controller('mainController', function($scope, $http, Lembretes){
+	.controller('mainController', function($scope, $http, Lembrete){
 		$scope.formData = {};
 
-	Lembretes.get().success(function(data){
+	Lembrete.get().success(function(data){
 		$scope.lembretes = data;
 	});
 
 	$scope.createLembrete = function(){
 		if($scope.formData.text != undefined){
-			Lembretes.create($scope.formData).success(function(data){
+			Lembrete.create($scope.formData).success(function(data){
 				$scope.formData = {};
 				$scope.lembretes = data;
 			});
@@ -16,7 +16,7 @@ angular.module('lembreteController', [])
 	};
 
 	$scope.deleteLembrete = function(id){
-		Lembretes.delete(id).success(function(data){
+		Lembrete.delete(id).success(function(data){
 			$scope.lembretes = data;
 		});
 	};
