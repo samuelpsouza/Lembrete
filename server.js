@@ -35,14 +35,15 @@ app.use(methodOverride('X-HTTP-Method-Override')); // override with the X-HTTP-M
 //
 
 var Lembrete = sequelize.define('Lembrete', {
-	msg: Sequelize.TEXT,
-	freezeTableName: true
+	msg: Sequelize.TEXT
 });
 
 var User = sequelize.define('User', {
 	name: Sequelize.STRING,
 	passwd: Sequelize.STRING
-})
+});
+
+sequelize.sync({force: true})
 
 //User.hasMany(Lembrete, {foreignKey: 'user_id'})
 
@@ -59,18 +60,41 @@ router.get('/', function(req, res){
 	res.json({ message: 'Everything is working' });
 });
 
-router.post('/createLembrete', function(req, res){
-		res.json({ message: "Created" });
+router.post('/createLembrete', function(req, res, next){
+	console.log(req.body);
+	if(req.body != ""){
+		var msg = {msg: req.body.msg};
+		Lembrete.create(msg).then(function(){
+			console.log("Created");
+		});
+	}
+	next();
 });
 router.get('/getLembretes', function(req, res){
-		res.json({ message: "All of them sent" });
+	Lembrete.findAll().then(function(lembretes){
+		res.send(lembretes);
+	});
 });
 
 router.put('/editLembrete/:lembrete_id', function(req, res){
-		res.json({ message: "Edited" });
+	Lembrete.findById(req.params.id, function(err, lembrete){
+		if(err)
+			res.send(err);
+		lembrete.msg = req.body.msg;
+		lembrete.save(function(err){
+			if(err)
+				res.send(err);
+			res.redirect('/getLembretes');
+		});
+	});
 });
+
 router.delete('/deleteLembrete/:lembrete_id', function(req, res){
-		res.json({ message: "Deleted" });
+	Lembrete.destroy({where : {id: req.params.id}}).then(function(){
+		Lembrete.findAll().then(function(lembretes){
+			res.send(lembretes);
+		});
+	});
 });
 
 
