@@ -7,6 +7,7 @@ var bodyParser = require('body-parser');
 var methodOverride = require('method-override');
 var Sequelize = require('sequelize');
 var restful = require('sequelize-restful');
+var passport = require('passport');
 //db
 
 var sequelize = new Sequelize('lembrete', 'admin', 'sam123', {
@@ -43,11 +44,16 @@ var User = sequelize.define('User', {
 	passwd: Sequelize.STRING
 });
 
+
+User.hasMany(Lembrete, {foreignKey: 'user_id'})
+
 sequelize.sync({force: true})
 
-//User.hasMany(Lembrete, {foreignKey: 'user_id'})
 
 //app.use(restful(sequelize));
+
+
+/* Router */
 
 var router = express.Router();
 
@@ -57,7 +63,7 @@ router.use(function(req, res, next){
 });
 
 router.get('/', function(req, res){
-	res.json({ message: 'Everything is working' });
+	res.redirect('/login.html');
 });
 
 router.post('/createLembrete', function(req, res, next){
@@ -100,6 +106,11 @@ router.delete('/deleteLembrete/:lembrete_id', function(req, res){
 
 app.use('/api', router);
 
+/* Passport */
+
+
+
 // listen (start app with node server.js) ======================================
+
 app.listen(3000);
 console.log("App listening on port 3000");
