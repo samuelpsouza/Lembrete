@@ -13,6 +13,8 @@ angular.module('lembreteService', [])
 			},
 			delete : function(id){
 				return $http.post('/api/deleteLembrete/' + id);
+			}
+
 		}
 	}
-});
+);

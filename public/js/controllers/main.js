@@ -40,5 +40,5 @@ angular.module('lembreteController', [])
 
 	$scope.disableEditor = function(){
 		$scope.editorEnabled = false;
-	}
+	};
 });

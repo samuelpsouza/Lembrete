@@ -132,13 +132,13 @@ var AuthController = {
 var router = express.Router();
 
 /*###############*/
-router.post('/login', passport.authenticate('local', {
+/*router.post('/login', passport.authenticate('local', {
 	successRedirect:'/',
 	failureRedirect: '/error.html'
 }));
-
-router.get('/login', function(req, res){
-	console.log("Login request");
+*/
+router.post('/login', function(req, res){
+	console.log("Login request: " + req.body);
 	res.redirect('/home.html');
 });
 
