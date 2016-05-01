@@ -18,9 +18,9 @@
 <body ng-controller="mainController">
 <div class="container">
 <h1>Meus Lembretes</h1>
-    <div class="row lemb ">
-        <div class="col-xs-6 col-md-3" ng-repeat="(key, value) in lembretes">
-            <div class="thumbnail">{{value.id}}</div>
+    <div class="row lemb">
+        <div class="col-md-4 col-md-4" ng-repeat="(key, value) in lembretes">
+            <div class="thumbnail" style="overflow-x:scroll;overflow-y:scroll;width: 350px; height: 180px">{{value.msg}}</div>
             <form  id="formMsg">
                 <button class="btn btn-danger" type="submit" ng-click="deleteLembrete(value.id)">Deletar</button>
                 <button class="btn btn-primary" type="submit" ng-click="editLembrete(value.id)">Editar</button>

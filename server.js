@@ -62,19 +62,18 @@ router.use(function(req, res, next){
 	next();
 });
 
-router.get('/', function(req, res){
-	res.json({message: "Working"});
-});
 
-router.post('/createLembrete', function(req, res, next){
-	console.log(req.body);
-	if(req.body != ""){
-		var msg = {msg: req.body};
+router.post('/createLembrete', function(req, res){
+	console.log(req.body.text);
+	if(req.body.text != ""){
+		var msg = {msg: req.body.text};
 		Lembrete.create(msg).then(function(){
 			console.log("Created");
+			Lembrete.findAll().then(function(lembretes){
+				res.send(lembretes);
+			});
 		});
 	}
-	next();
 });
 
 router.get('/getLembretes', function(req, res){
@@ -83,20 +82,23 @@ router.get('/getLembretes', function(req, res){
 	});
 });
 
-router.put('/editLembrete/:lembrete_id', function(req, res){
+router.put('/editLembrete/:id', function(req, res){
 	Lembrete.findById(req.params.id, function(err, lembrete){
 		if(err)
 			res.send(err);
-		lembrete.msg = req.body.msg;
+		lembrete.msg = req.body.text;
 		lembrete.save(function(err){
 			if(err)
 				res.send(err);
-			res.redirect('/getLembretes');
+			Lembrete.findAll().then(function(lembretes){
+				res.send(lembretes);
+			});
 		});
 	});
 });
 
-router.delete('/deleteLembrete/:lembrete_id', function(req, res){
+router.post('/deleteLembrete/:id', function(req, res){
+	console.log('trying to delete');
 	Lembrete.destroy({where : {id: req.params.id}}).then(function(){
 		Lembrete.findAll().then(function(lembretes){
 			res.send(lembretes);
