@@ -1,6 +1,8 @@
 angular.module('lembreteController', [])
 	.controller('mainController', function($scope, $http, Lembrete){
 		$scope.formData = {};
+		$scope.editorEnabled = false;
+		$scope.lembrete_id = '';
 
 	Lembrete.get().success(function(data){
 		$scope.lembretes = data;
@@ -17,9 +19,10 @@ angular.module('lembreteController', [])
 
 	$scope.editLembrete = function(id){
 		if ($scope.formData.text != undefined) {
-			Lembrete.edit($scope.formData).success(function(data){
+			Lembrete.edit($scope.lembrete_id, $scope.formData).success(function(data){
 				$scope.formData = {};
 				$scope.lembretes = data;
+				$scope.disableEditor();
 			});
 		}
 	};
@@ -29,4 +32,13 @@ angular.module('lembreteController', [])
 			$scope.lembretes = data;
 		});
 	};
+
+	$scope.enableEditor = function(id){
+		$scope.editorEnabled = true;
+		$scope.lembrete_id = id;
+	};
+
+	$scope.disableEditor = function(){
+		$scope.editorEnabled = false;
+	}
 });

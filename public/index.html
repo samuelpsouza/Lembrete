@@ -20,14 +20,24 @@
 <h1>Meus Lembretes</h1>
     <div class="row lemb">
         <div class="col-md-4 col-md-4" ng-repeat="(key, value) in lembretes">
-            <div class="thumbnail" style="overflow-x:scroll;overflow-y:scroll;width: 350px; height: 180px">{{value.msg}}</div>
-            <form  id="formMsg">
+            <div class="thumbnail" style="overflow-x:scroll;overflow-y:scroll;width: 350px; height: 180px">
+                {{value.msg}}
+            </div>
+            <form  id="formMsg" ng-hide="editorEnabled">
                 <button class="btn btn-danger" type="submit" ng-click="deleteLembrete(value.id)">Deletar</button>
-                <button class="btn btn-primary" type="submit" ng-click="editLembrete(value.id)">Editar</button>
+                <button class="btn btn-primary" type="submit" ng-click="enableEditor(value.id)">Editar</button>
             </form>
         </div>    
+        <div ng-show="editorEnabled">
+            <form class="form" >
+                <textarea rows="3" cols="60" ng-model="formData.text" ng-show="editorEnabled"></textarea><br />
+                <button class="btn btn-success" type="submit" ng-click="editLembrete()">Salvar</button>
+                <button class="btn btn-primary" type="submit" ng-click="disableEditor()">Cancelar</button>
+            </form>
+        </div>
+
     </div>
-    <div class="formField">
+    <div class="formField" ng-hide="editorEnabled">
         <form class="form" >
             <textarea rows="3" cols="60" placeholder="Escreva seu lembrete" ng-model="formData.text"></textarea><br />
             <button class="btn btn-success" type="submit" ng-click="createLembrete()">Add Lembrete</button>

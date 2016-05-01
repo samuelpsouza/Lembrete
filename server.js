@@ -82,7 +82,7 @@ router.get('/getLembretes', function(req, res){
 	});
 });
 
-router.put('/editLembrete/:id', function(req, res){
+router.post('/editLembrete/:id', function(req, res){
 	Lembrete.findById(req.params.id, function(err, lembrete){
 		if(err)
 			res.send(err);
