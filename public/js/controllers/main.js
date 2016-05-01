@@ -15,6 +15,10 @@ angular.module('lembreteController', [])
 		}
 	};
 
+	$scope.editLembrete = function(id){
+
+	};
+	
 	$scope.deleteLembrete = function(id){
 		Lembrete.delete(id).success(function(data){
 			$scope.lembretes = data;

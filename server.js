@@ -7,7 +7,7 @@ var bodyParser = require('body-parser');
 var methodOverride = require('method-override');
 var Sequelize = require('sequelize');
 var restful = require('sequelize-restful');
-var passport = require('passport');
+
 //db
 
 var sequelize = new Sequelize('lembrete', 'admin', 'sam123', {
@@ -33,21 +33,21 @@ app.use(bodyParser.json()); // parse application/json
 app.use(bodyParser.json({type: 'application/vnd.api+json'})); // parse application/vnd.api+json as json
 app.use(methodOverride('X-HTTP-Method-Override')); // override with the X-HTTP-Method-Override header in the request
 
-//
+// Models
 
 var Lembrete = sequelize.define('Lembrete', {
 	msg: Sequelize.TEXT
 });
 
 var User = sequelize.define('User', {
-	name: Sequelize.STRING,
+	name: { type: Sequelize.STRING, primaryKey: true},
 	passwd: Sequelize.STRING
 });
 
 
-User.hasMany(Lembrete, {foreignKey: 'user_id'})
+//User.hasMany(Lembrete, {foreignKey: 'user_id'});
 
-sequelize.sync({force: true})
+sequelize.sync({force: true});
 
 
 //app.use(restful(sequelize));
@@ -63,19 +63,20 @@ router.use(function(req, res, next){
 });
 
 router.get('/', function(req, res){
-	res.redirect('/login.html');
+	res.json({message: "Working"});
 });
 
 router.post('/createLembrete', function(req, res, next){
 	console.log(req.body);
 	if(req.body != ""){
-		var msg = {msg: req.body.msg};
+		var msg = {msg: req.body};
 		Lembrete.create(msg).then(function(){
 			console.log("Created");
 		});
 	}
 	next();
 });
+
 router.get('/getLembretes', function(req, res){
 	Lembrete.findAll().then(function(lembretes){
 		res.send(lembretes);
@@ -103,12 +104,7 @@ router.delete('/deleteLembrete/:lembrete_id', function(req, res){
 	});
 });
 
-
 app.use('/api', router);
-
-/* Passport */
-
-
 
 // listen (start app with node server.js) ======================================
 
