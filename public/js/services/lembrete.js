@@ -13,6 +13,12 @@ angular.module('lembreteService', [])
 			},
 			delete : function(id){
 				return $http.post('/api/deleteLembrete/' + id);
+			},
+			login : function(username, passwd){
+				return $http.post('/api/login/' + username);
+			},
+			logout : function(){
+				return $http.get('/api/logout');
 			}
 
 		}

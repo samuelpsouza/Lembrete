@@ -1,5 +1,5 @@
 angular.module('lembreteController', [])
-	.controller('mainController', function($scope, $http, Lembrete){
+	.controller('mainController', function($scope, $http, $window, Lembrete){
 		$scope.formData = {};
 		$scope.editorEnabled = false;
 		$scope.lembrete_id = '';
@@ -31,6 +31,23 @@ angular.module('lembreteController', [])
 		Lembrete.delete(id).success(function(data){
 			$scope.lembretes = data;
 		});
+	};
+
+	$scope.login = function(){
+		Lembrete.login($scope.userName.text, $scope.userPasswd.text).success(function(data){
+			$window.location.href = '/api/getHome';
+			$window.location.href;
+			//$location.path('/getLembretes');
+		});
+	};
+
+	$scope.logout = function(){
+		Lembrete.logout().success(function(){
+			$window.location.href = '/';
+			$window.location.href;
+
+		});
+
 	};
 
 	$scope.enableEditor = function(id){

@@ -61,66 +61,6 @@ sequelize.sync({force: true});
 
 /*##########################*/
 
-var PassportLocalStrategy = require('passport-local').Strategy;
-
-var auth = {};
-
-auth.localStrategy = new PassportLocalStrategy({
-	username: 'username',
-	passwd: 'passwd'
-}, 
-	function (username, passwd, done){
-		User.findById({username: username}).then(function(user){
-			if (!user) {
-				return done(null, false, {message: "Usuario não existe"});
-			}
-			if (user.passwd !== passwd) {
-				return done(null, false, {message: "Senha errada"});
-			}
-
-			return done(null, {username: user.username});
-		});
-	}
-);
-
-auth.validPasswd = function(passwd){
-	return this.passwd === passwd;
-};
-
-auth.serializeUser = function(user, done){
-	done(null, user);
-};
-
-auth.deserializeUser = function(obj, done){
-	done(null, obj);
-};
-
-var AuthController = {
-
-  login: passport.authenticate('local', {
-    successRedirect: '/auth/login/success',
-    failureRedirect: '/auth/login/failure'
-  }),
-
-  loginSuccess: function(req, res){
-    res.json({
-      success: true,
-      user: req.session.passport.user
-    });
-  },
-
-  loginFailure: function(req, res){
-    res.json({
-      success:false,
-      message: 'Invalid username or password.'
-    });
-  },
-
-  logout: function(req, res){
-    req.logout();
-    res.end();
-  },
-};
 
 /*##########################*/
 
@@ -137,13 +77,13 @@ var router = express.Router();
 	failureRedirect: '/error.html'
 }));
 */
-router.post('/login', function(req, res){
-	console.log("Login request: " + req.body);
-	res.redirect('/home.html');
+
+router.post('/login/:username', function(req, res){
+	console.log("Login request: " + req.params.username);
+	res.json({message: "ok"});
 });
 
 router.get('/logout', function(req, res){
-	req.logout();
 	res.redirect('/');
 });
 
@@ -154,6 +94,9 @@ router.use(function(req, res, next){
 	next();
 });
 
+router.get('/getHome', function(req, res){
+	res.redirect('/home.html');
+});
 
 router.post('/createLembrete', function(req, res){
 	console.log(req.body.text);
