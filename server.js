@@ -7,6 +7,12 @@ var bodyParser = require('body-parser');
 var methodOverride = require('method-override');
 var Sequelize = require('sequelize');
 var restful = require('sequelize-restful');
+var flash = require('connect-flash');
+var cookieParser = require('cookie-parser');
+var session = require('express-session');
+var passport = require('passport');
+LocalStrategy = require('passport-local').Strategy;
+
 
 //db
 
@@ -32,7 +38,11 @@ app.use(bodyParser.urlencoded({'extended': 'true'})); // parse application/x-www
 app.use(bodyParser.json()); // parse application/json
 app.use(bodyParser.json({type: 'application/vnd.api+json'})); // parse application/vnd.api+json as json
 app.use(methodOverride('X-HTTP-Method-Override')); // override with the X-HTTP-Method-Override header in the request
-
+app.use(flash());
+app.use(cookieParser());
+app.use(session({secret: "mysecret"}));
+app.use(passport.initialize());
+app.use(passport.session());
 // Models
 
 var Lembrete = sequelize.define('Lembrete', {
@@ -49,6 +59,70 @@ var User = sequelize.define('User', {
 
 sequelize.sync({force: true});
 
+/*##########################*/
+
+var PassportLocalStrategy = require('passport-local').Strategy;
+
+var auth = {};
+
+auth.localStrategy = new PassportLocalStrategy({
+	username: 'username',
+	passwd: 'passwd'
+}, 
+	function (username, passwd, done){
+		User.findById({username: username}).then(function(user){
+			if (!user) {
+				return done(null, false, {message: "Usuario não existe"});
+			}
+			if (user.passwd !== passwd) {
+				return done(null, false, {message: "Senha errada"});
+			}
+
+			return done(null, {username: user.username});
+		});
+	}
+);
+
+auth.validPasswd = function(passwd){
+	return this.passwd === passwd;
+};
+
+auth.serializeUser = function(user, done){
+	done(null, user);
+};
+
+auth.deserializeUser = function(obj, done){
+	done(null, obj);
+};
+
+var AuthController = {
+
+  login: passport.authenticate('local', {
+    successRedirect: '/auth/login/success',
+    failureRedirect: '/auth/login/failure'
+  }),
+
+  loginSuccess: function(req, res){
+    res.json({
+      success: true,
+      user: req.session.passport.user
+    });
+  },
+
+  loginFailure: function(req, res){
+    res.json({
+      success:false,
+      message: 'Invalid username or password.'
+    });
+  },
+
+  logout: function(req, res){
+    req.logout();
+    res.end();
+  },
+};
+
+/*##########################*/
 
 //app.use(restful(sequelize));
 
@@ -56,6 +130,24 @@ sequelize.sync({force: true});
 /* Router */
 
 var router = express.Router();
+
+/*###############*/
+router.post('/login', passport.authenticate('local', {
+	successRedirect:'/',
+	failureRedirect: '/error.html'
+}));
+
+router.get('/login', function(req, res){
+	console.log("Login request");
+	res.redirect('/home.html');
+});
+
+router.get('/logout', function(req, res){
+	req.logout();
+	res.redirect('/');
+});
+
+/*###############*/
 
 router.use(function(req, res, next){
 	console.log("A request is here.");
