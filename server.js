@@ -61,15 +61,21 @@ var Lembrete = sequelize.define('Lembrete', {
 }, {
 	classMethods: {
 		associate: function(){
-			Lembrete.belongsTo(User, {foreignKey: "name"});
+			Lembrete.belongsTo(User, {as: "owner", foreignKey: "name"});
 		}
 	}
 });
 
-sequelize.sync({force: true});
+User.hasMany(Lembrete);
+Lembrete.belongsTo(User);
 
-/*##########################*/
 
+User.sync().then(function(){
+	return User.create({
+		name:"samuel",
+		passwd: "samuel"
+	});
+});
 
 /*##########################*/
 
@@ -79,13 +85,6 @@ sequelize.sync({force: true});
 /* Router */
 
 var router = express.Router();
-
-/*###############*/
-/*router.post('/login', passport.authenticate('local', {
-	successRedirect:'/',
-	failureRedirect: '/error.html'
-}));
-*/
 
 router.post('/login/:username/:passwd', function(req, res){
 	console.log("Login request: " + req.params.username + req.params.passwd);
