@@ -45,17 +45,26 @@ app.use(passport.initialize());
 app.use(passport.session());
 // Models
 
-var Lembrete = sequelize.define('Lembrete', {
-	msg: Sequelize.TEXT
-});
-
 var User = sequelize.define('User', {
 	name: { type: Sequelize.STRING, primaryKey: true},
 	passwd: Sequelize.STRING
+}, {
+	classMethods: {
+		associate: function(){
+			User.hasMany(Lembrete);
+		}
+	}
 });
 
-
-//User.hasMany(Lembrete, {foreignKey: 'user_id'});
+var Lembrete = sequelize.define('Lembrete', {
+	msg: Sequelize.TEXT
+}, {
+	classMethods: {
+		associate: function(){
+			Lembrete.belongsTo(User, {foreignKey: "name"});
+		}
+	}
+});
 
 sequelize.sync({force: true});
 
@@ -78,8 +87,8 @@ var router = express.Router();
 }));
 */
 
-router.post('/login/:username', function(req, res){
-	console.log("Login request: " + req.params.username);
+router.post('/login/:username/:passwd', function(req, res){
+	console.log("Login request: " + req.params.username + req.params.passwd);
 	res.json({message: "ok"});
 });
 

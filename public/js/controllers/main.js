@@ -37,7 +37,9 @@ angular.module('lembreteController', [])
 		Lembrete.login($scope.userName.text, $scope.userPasswd.text).success(function(data){
 			$window.location.href = '/api/getHome';
 			$window.location.href;
-			//$location.path('/getLembretes');
+		}).error(function(data){
+			$window.location.href = '/';
+			$window.location.href;			
 		});
 	};
 
@@ -45,7 +47,6 @@ angular.module('lembreteController', [])
 		Lembrete.logout().success(function(){
 			$window.location.href = '/';
 			$window.location.href;
-
 		});
 
 	};
