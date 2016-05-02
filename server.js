@@ -6,11 +6,13 @@ var morgan = require('morgan');
 var bodyParser = require('body-parser');
 var methodOverride = require('method-override');
 var Sequelize = require('sequelize');
+var restful = require('sequelize-restful');
 var flash = require('connect-flash');
 var cookieParser = require('cookie-parser');
 var session = require('express-session');
+var jwt = require('jsonwebtoken');
+var config = require('./config');
 var passport = require('passport');
-
 //db
 
 var sequelize = new Sequelize('lembrete', 'admin', 'sam123', {
@@ -40,15 +42,163 @@ app.use(cookieParser());
 app.use(session({secret: "mysecret"}));
 app.use(passport.initialize());
 app.use(passport.session());
+// Models
 
-//
-require('./config/passport')(passport);
+var User = sequelize.define('User', {
+	id: {
+		type: Sequelize.INTEGER,
+		primaryKey: true,
+		autoIncrement: true
+	},
+	name: { 
+		type: Sequelize.STRING, unique: true
+	},
+	passwd: Sequelize.STRING, 
+}, {	
+	freezeTableName: true
 
-//route
+});
+
+var Lembrete = sequelize.define('Lembrete', {
+	id: {
+		type: Sequelize.INTEGER,
+		primaryKey: true,
+		autoIncrement: true
+	},
+	msg: Sequelize.TEXT
+}, {
+	freezeTableName: true
+
+});
+
+Lembrete.belongsTo(User, {
+	foreignKey: "userId", as: "Owner"
+});
+
+sequelize.sync({force:true});
+
+User.sync().then(function(){
+	return User.create({
+		name:"samuel",
+		passwd: "samuel"
+	});
+});
+
+/*##########################*/
+
+//app.use(restful(sequelize));
+
+/* ################################################################################### */
+
+app.set('superSecret', config.secret);
 
 var router = express.Router();
-require('./app/routes.js')(router, passport);
+
+router.post('/login', function(req, res){
+
+	var sql = {where: {name: "samuel"}, include: [{all: true}]};
+
+	User.findOne(sql).then(function(err, user) {
+			if (err) throw err;
+
+			if(!user) {
+				res.json({success: false, message: "Login falhou. Usuario não encontrado."});
+			} else if (user){
+				if (user.passwd != req.body.passwd){
+					res.json({success:false, message: "Senha incorreta."});
+				} else {
+					var token = jwt.sign(user, app.get('superSecret'), {
+						expiresInMinutes: 500
+					});
+
+					res.json({
+						success: true,
+						message: "Seu token",
+						token: token
+					});
+				}
+			}
+		
+	});
+});
+
+
+router.use(function(res, req, next){
+	
+	var token = req.body.token || req.param('token') || req.headers['master-token'];
+	
+	if (token) {
+		jwt.verify(token, app.get('superSecret'), function(err, decoded){
+			if (err) {
+				return res.json({success: false, message: "Não foi possivel verificar token."});
+			}else {
+				req.decoded = decoded;
+				next();
+			}
+		});
+	} else {
+		return res.status(403).send({
+			success: false, message: "Nenhum token enviado."
+		});
+	}
+});
+
+
+router.get('/getHome', function(req, res){
+	res.redirect('/home.html');
+});
+
+router.post('/createLembrete', function(req, res){
+	if(req.body.text != ""){
+
+		var msg = {msg: req.body.text};
+		var name = {where: req.body.token.user.name};
+		Lembrete.create(msg).then(function(){
+			Lembrete.findAll({name}).then(function(lembretes){
+				res.json(lembretes);
+			});
+		});
+	}
+});
+
+router.get('/getLembretes', function(req, res){
+	var name = {where: req.body.token.user.name};
+	Lembrete.findAll({name}).then(function(lembretes){
+		res.json(lembretes);
+	});
+});
+
+router.put('/editLembrete/:id', function(req, res){
+	Lembrete.findById(req.params.id, function(err, lembrete){
+		if(err)
+			res.send(err);
+		lembrete.msg = req.body.text;
+		lembrete.save(function(err){
+			if(err)
+				res.send(err);
+			Lembrete.findAll().then(function(lembretes){
+				res.send(lembretes);
+			});
+		});
+	});
+});
+
+router.post('/deleteLembrete/:id', function(req, res){
+	Lembrete.destroy({where : {id: req.params.id}}).then(function(){
+		Lembrete.findAll().then(function(lembretes){
+			res.json(lembretes);
+		});
+	});
+});
+
+router.post('/logout', function(req, res){
+	res.redirect('/');
+});
+
 app.use('/api/', router);
+
+/* ################################################################################### */
+
 
 // listen (start app with node server.js) ======================================
 
