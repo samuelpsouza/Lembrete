@@ -4,10 +4,6 @@ angular.module('lembreteController', [])
 		$scope.editorEnabled = false;
 		$scope.lembrete_id = '';
 
-	Lembrete.get().success(function(data){
-		$scope.lembretes = data;
-	});
-
 	$scope.createLembrete = function(){
 		if($scope.formData.text != undefined){
 			Lembrete.create($scope.formData).success(function(data){

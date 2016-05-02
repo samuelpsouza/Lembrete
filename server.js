@@ -86,31 +86,11 @@ app.set('superSecret', config.secret);
 
 var router = express.Router();
 
-router.use(function(res, req, next){
-	
-	var token = req.body.token || req.query.token || req.headers['master-token'];
-
-	if (token) {
-		jwt.verify(token, app.get('superSecret'), function(err, decoded){
-			if (err) {
-				return res.json({success: false, message: "Não foi possivel verificar token."});
-			}else {
-				req.decoded = decoded;
-				next();
-			}
-		});
-	} else {
-		return res.status(403).send({
-			success: false, message: "Nenhum token enviado."
-		});
-	}
-});
-
 router.post('/login', function(req, res){
-	User.findOne({
-		name: req.body.username
-	}, {
-		function(err, user) {
+
+	var sql = {where: {name: "samuel"}, include: [Lembrete]};
+
+	User.find(sql).then(function(err, user) {
 			if (err) throw err;
 
 			if(!user) {
@@ -130,8 +110,29 @@ router.post('/login', function(req, res){
 					});
 				}
 			}
-		}
+		
 	});
+});
+
+
+router.use(function(res, req, next){
+	
+	var token = req.body.token || req.param('token') || req.headers['master-token'];
+	
+	if (token) {
+		jwt.verify(token, app.get('superSecret'), function(err, decoded){
+			if (err) {
+				return res.json({success: false, message: "Não foi possivel verificar token."});
+			}else {
+				req.decoded = decoded;
+				next();
+			}
+		});
+	} else {
+		return res.status(403).send({
+			success: false, message: "Nenhum token enviado."
+		});
+	}
 });
 
 
@@ -182,7 +183,7 @@ router.post('/deleteLembrete/:id', function(req, res){
 	});
 });
 
-router.get('/logout', function(req, res){
+router.post('/logout', function(req, res){
 	res.redirect('/');
 });
 
