@@ -10,10 +10,9 @@ var restful = require('sequelize-restful');
 var flash = require('connect-flash');
 var cookieParser = require('cookie-parser');
 var session = require('express-session');
+var jwt = require('jsonwebtoken');
+var config = require('./config');
 var passport = require('passport');
-LocalStrategy = require('passport-local').Strategy;
-
-
 //db
 
 var sequelize = new Sequelize('lembrete', 'admin', 'sam123', {
@@ -81,25 +80,57 @@ User.sync().then(function(){
 
 //app.use(restful(sequelize));
 
+/* ################################################################################### */
 
-/* Router */
+app.set('superSecret', config.secret);
 
 var router = express.Router();
 
-router.post('/login/:username/:passwd', function(req, res){
-	console.log("Login request: " + req.params.username + req.params.passwd);
-	res.json({message: "ok"});
+router.post('/login', function(req, res){
+	User.findOne({
+		name: req.body.username
+	}, {
+		function(err, user) {
+			if (err) throw err;
+
+			if(!user) {
+				res.json({success: false, message: "Login falhou. Usuario não encontrado."});
+			} else if (user){
+				if (user.passwd != req.body.passwd){
+					res.json({success:false, message: "Senha incorreta."});
+				} else {
+					var token = jwt.sign(user, app.get('superSecret'), {
+						expiresInMinutes: 500
+					});
+
+					res.json({
+						success: true,
+						message: "Seu token",
+						token: token
+					});
+				}
+			}
+		}
+	});
 });
 
-router.get('/logout', function(req, res){
-	res.redirect('/');
-});
+router.use(function(res, req, next){
+	var token = req.body.token || req.query.token || req.headers['master-token'];
 
-/*###############*/
-
-router.use(function(req, res, next){
-	console.log("A request is here.");
-	next();
+	if (token) {
+		jwt.verify(token, app.get('superSecret'), function(err, decoded){
+			if (err) {
+				return json.({success: false, message: "Não foi possivel verificar token."});
+			}else {
+				req.decoded = decoded;
+				next();
+			}
+		});
+	} else {
+		return res.status(403).send({
+			success: false, message: "Nenhum token enviado."
+		});
+	}
 });
 
 router.get('/getHome', function(req, res){
@@ -107,25 +138,24 @@ router.get('/getHome', function(req, res){
 });
 
 router.post('/createLembrete', function(req, res){
-	console.log(req.body.text);
 	if(req.body.text != ""){
+
 		var msg = {msg: req.body.text};
 		Lembrete.create(msg).then(function(){
-			console.log("Created");
-			Lembrete.findAll().then(function(lembretes){
-				res.send(lembretes);
+			Lembrete.findAll({where:{token.user.name}}).then(function(lembretes){
+				res.json(lembretes);
 			});
 		});
 	}
 });
 
 router.get('/getLembretes', function(req, res){
-	Lembrete.findAll().then(function(lembretes){
-		res.send(lembretes);
+	Lembrete.findAll({where:{token.user.name}}).then(function(lembretes){
+		res.json(lembretes);
 	});
 });
 
-router.post('/editLembrete/:id', function(req, res){
+router.put('/editLembrete/:id', function(req, res){
 	Lembrete.findById(req.params.id, function(err, lembrete){
 		if(err)
 			res.send(err);
@@ -141,15 +171,21 @@ router.post('/editLembrete/:id', function(req, res){
 });
 
 router.post('/deleteLembrete/:id', function(req, res){
-	console.log('trying to delete');
 	Lembrete.destroy({where : {id: req.params.id}}).then(function(){
 		Lembrete.findAll().then(function(lembretes){
-			res.send(lembretes);
+			res.json(lembretes);
 		});
 	});
 });
 
-app.use('/api', router);
+router.get('/logout', function(req, res){
+	res.redirect('/');
+});
+
+app.use('/api/', router);
+
+/* ################################################################################### */
+
 
 // listen (start app with node server.js) ======================================
 
