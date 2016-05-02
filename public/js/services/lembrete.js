@@ -14,8 +14,8 @@ angular.module('lembreteService', [])
 			delete : function(id){
 				return $http.post('/api/deleteLembrete/' + id);
 			},
-			login : function(username, passwd){
-				return $http.post('/api/login/' + username + '/' + passwd);
+			login : function(userdata){
+				return $http.post('/api/login', userdata);
 			},
 			logout : function(){
 				return $http.get('/api/logout');

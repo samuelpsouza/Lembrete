@@ -86,6 +86,26 @@ app.set('superSecret', config.secret);
 
 var router = express.Router();
 
+router.use(function(res, req, next){
+	
+	var token = req.body.token || req.query.token || req.headers['master-token'];
+
+	if (token) {
+		jwt.verify(token, app.get('superSecret'), function(err, decoded){
+			if (err) {
+				return res.json({success: false, message: "Não foi possivel verificar token."});
+			}else {
+				req.decoded = decoded;
+				next();
+			}
+		});
+	} else {
+		return res.status(403).send({
+			success: false, message: "Nenhum token enviado."
+		});
+	}
+});
+
 router.post('/login', function(req, res){
 	User.findOne({
 		name: req.body.username
@@ -114,24 +134,6 @@ router.post('/login', function(req, res){
 	});
 });
 
-router.use(function(res, req, next){
-	var token = req.body.token || req.query.token || req.headers['master-token'];
-
-	if (token) {
-		jwt.verify(token, app.get('superSecret'), function(err, decoded){
-			if (err) {
-				return json.({success: false, message: "Não foi possivel verificar token."});
-			}else {
-				req.decoded = decoded;
-				next();
-			}
-		});
-	} else {
-		return res.status(403).send({
-			success: false, message: "Nenhum token enviado."
-		});
-	}
-});
 
 router.get('/getHome', function(req, res){
 	res.redirect('/home.html');
@@ -141,8 +143,9 @@ router.post('/createLembrete', function(req, res){
 	if(req.body.text != ""){
 
 		var msg = {msg: req.body.text};
+		var name = {where: req.body.token.user.name};
 		Lembrete.create(msg).then(function(){
-			Lembrete.findAll({where:{token.user.name}}).then(function(lembretes){
+			Lembrete.findAll({name}).then(function(lembretes){
 				res.json(lembretes);
 			});
 		});
@@ -150,7 +153,8 @@ router.post('/createLembrete', function(req, res){
 });
 
 router.get('/getLembretes', function(req, res){
-	Lembrete.findAll({where:{token.user.name}}).then(function(lembretes){
+	var name = {where: req.body.token.user.name};
+	Lembrete.findAll({name}).then(function(lembretes){
 		res.json(lembretes);
 	});
 });
