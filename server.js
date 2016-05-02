@@ -45,29 +45,37 @@ app.use(passport.session());
 // Models
 
 var User = sequelize.define('User', {
-	name: { type: Sequelize.STRING, primaryKey: true},
-	passwd: Sequelize.STRING
-}, {
-	classMethods: {
-		associate: function(){
-			User.hasMany(Lembrete);
-		}
-	}
+	id: {
+		type: Sequelize.INTEGER,
+		primaryKey: true,
+		autoIncrement: true
+	},
+	name: { 
+		type: Sequelize.STRING, unique: true
+	},
+	passwd: Sequelize.STRING, 
+}, {	
+	freezeTableName: true
+
 });
 
 var Lembrete = sequelize.define('Lembrete', {
+	id: {
+		type: Sequelize.INTEGER,
+		primaryKey: true,
+		autoIncrement: true
+	},
 	msg: Sequelize.TEXT
 }, {
-	classMethods: {
-		associate: function(){
-			Lembrete.belongsTo(User, {as: "owner", foreignKey: "name"});
-		}
-	}
+	freezeTableName: true
+
 });
 
-User.hasMany(Lembrete);
-Lembrete.belongsTo(User);
+Lembrete.belongsTo(User, {
+	foreignKey: "userId", as: "Owner"
+});
 
+sequelize.sync({force:true});
 
 User.sync().then(function(){
 	return User.create({
@@ -88,9 +96,9 @@ var router = express.Router();
 
 router.post('/login', function(req, res){
 
-	var sql = {where: {name: "samuel"}, include: [Lembrete]};
+	var sql = {where: {name: "samuel"}, include: [{all: true}]};
 
-	User.find(sql).then(function(err, user) {
+	User.findOne(sql).then(function(err, user) {
 			if (err) throw err;
 
 			if(!user) {
