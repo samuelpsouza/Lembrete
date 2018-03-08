@@ -84,12 +84,6 @@ User.sync().then(function(){
 	});
 });
 
-/*##########################*/
-
-//app.use(restful(sequelize));
-
-/* ################################################################################### */
-
 app.set('superSecret', config.secret);
 
 var router = express.Router();
