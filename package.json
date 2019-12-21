@@ -29,7 +29,7 @@
     "passport": "^0.3.2",
     "passport-jwt": "^2.0.0",
     "passport-local": "^1.0.0",
-    "pg": "^4.5.5",
+    "pg": "^6.4.2",
     "sequelize": ">=5.3.0",
     "sequelize-authentication": "^0.3.0",
     "sequelize-restful": "^0.4.3"
