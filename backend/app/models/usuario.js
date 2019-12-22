@@ -3,14 +3,14 @@
 module.exports = (sequelize, DataTypes) => {
     const Usuario = sequelize.define('Usuario', {
         id: {
-            type: Sequelize.INTEGER,
+            type: DataTypes.INTEGER,
             primaryKey: true,
             autoIncrement: true
         },
         name: {
-            type: Sequelize.STRING, unique: true
+            type: DataTypes.STRING, unique: true
         },
-        password: Sequelize.STRING,
+        password: DataTypes.STRING,
     });
 
     return Usuario;
