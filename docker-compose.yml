@@ -1,0 +1,11 @@
+version: '3'
+services:
+  lembrete:
+    build: .
+    ports:
+    - "8080:8080"
+    environment: 
+      - DEV_DB_USERNAME
+      - DEV_DB_PASSWORD
+      - DEV_DB_DATABASE
+      - DEV_DB_HOSTNAME
