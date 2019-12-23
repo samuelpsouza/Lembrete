@@ -13,6 +13,6 @@ RUN npm install --only=production
 # Bundle app source
 COPY . .
 
-EXPOSE 8080
+EXPOSE 3000
 
-CMD [ "npm", "start" ]
+CMD [ "pm2-runtime", "npm", "--", "start" ]
