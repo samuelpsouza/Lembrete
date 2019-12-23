@@ -11,6 +11,8 @@ services:
       - DEV_DB_HOSTNAME
     networks: 
       - lembrete
+    depends_on: 
+      - db
   db:
     image: postgres
     environment:
