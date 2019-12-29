@@ -1,19 +1,20 @@
 'use strict';
 
-module.exports = (sequelize, DataTypes) => {
-	const Lembrete = sequelize.define('Lembrete', {
-		id: {
-			type: DataTypes.INTEGER,
-			primaryKey: true,
-			autoIncrement: true
-		},
-		titulo: DataTypes.STRING,
-		mensagem: DataTypes.STRING,
-	});
+const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
 
-	Lembrete.associate = (models) => {
-		models.Lembrete.hasOne(models.Usuario, { as: 'id_usuario' });
-	};
+const PostitSchema = new Schema({
+	title: {
+		type: String,
+		validate: [validateLocalStrategyProperty, 'Please fill in your title'],
+		required: true
+	},
+    text: {
+		type: String,
+		max: 140,
+		validate: [validateLocalStrategyProperty, 'Please fill in your text'],
+		required: true
+    }
+});
 
-	return Lembrete;
-};
+mongoose.model('Postit', PostitSchema);

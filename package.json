@@ -6,9 +6,7 @@
   "scripts": {
     "start": "cross-env NODE_ENV=production pm2 start ./backend/bin/www --name lembrete",
     "start-dev": "cross-env NODE_ENV=development DEBUG=express-sequelize nodemon ./backend/bin/www",
-    "test": "npm run test-unit",
-    "migrate": "node_modules/.bin/sequelize db:migrate",
-    "migrationstatus": "node_modules/.bin/sequelize db:migrate:status"
+    "test": "npm run test-unit"
   },
   "repository": {
     "type": "git",
@@ -33,10 +31,9 @@
     "http-status": "^1.4.2",
     "joi": "^14.3.1",
     "method-override": "^3.0.0",
+    "mongoose": "^5.8.3",
     "morgan": "^1.9.1",
-    "pg": "^7.15.1",
     "pm2": "^4.2.1",
-    "sequelize": "^5.21.3",
     "winston": "^3.2.1"
   },
   "devDependencies": {

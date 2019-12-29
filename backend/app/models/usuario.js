@@ -1,17 +1,18 @@
 'use strict';
 
-module.exports = (sequelize, DataTypes) => {
-    const Usuario = sequelize.define('Usuario', {
-        id: {
-            type: DataTypes.INTEGER,
-            primaryKey: true,
-            autoIncrement: true
-        },
-        name: {
-            type: DataTypes.STRING, unique: true
-        },
-        password: DataTypes.STRING,
-    });
+const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
 
-    return Usuario;
+const UserSchema = new Schema({
+    firstName: {
+        type: String,
+        trim: true,
+        validate: [validateLocalStrategyProperty, 'Please fill in your first name']
+    },
+});
+
+const validateLocalStrategyProperty = function(property) {
+    return ((this.provider !== 'local' && !this.updated) || property.length);
 };
+
+mongoose.model('User', UserSchema);
